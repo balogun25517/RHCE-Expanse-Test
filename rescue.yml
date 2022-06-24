@@ -1,0 +1,30 @@
+---
+- hosts: web
+  become: yes 
+  tasks: 
+  - name: Remove httpd.conf
+    file:
+       path: /etc/httpd/conf/httpd.conf
+       state: absent
+  - name: send bad config file
+    lineinfile: 
+       path: /etc/httpd/conf/httpd.conf
+       line: "This is a bad file \n this is a bad file"
+       state: present
+       create: yes
+  - name: Restart httpd servr
+    block:
+    - name: Restare Httpd
+      service: 
+        name: httpd
+        state: restarted
+    rescue: 
+    - name: copy correct httpd file
+      copy:
+        src: /etc/httpd/conf/httpd.conf.backup
+        dest: /etc/httpd/conf/httpd.conf
+    - name: Restart httpd servr
+      service: 
+        name: httpd
+        state: restarted
+    

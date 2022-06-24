@@ -1,0 +1,13 @@
+[dev]
+worker1
+
+[chi_aws]
+worker2
+
+[nyc_aws]
+worker3
+worker4
+[web]
+worker2
+worker4
+worker3

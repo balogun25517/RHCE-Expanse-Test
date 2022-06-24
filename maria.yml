@@ -1,0 +1,29 @@
+---
+- hosts: all 
+  become: yes
+  tasks:
+  - name: Store MariaDB log from Worker3 to a variable called checks
+    shell: grep ready /var/log/mariadb/mariadb.log | tail -n1 | awk '{print $2,"on",$1}'
+    register: checks
+  - name: debug var
+    debug: var=hostvars['worker1']['checks']['stdout']
+  - name: Add to index html 
+    lineinfile: 
+       path: /var/www/html/index.html
+       line: "The Database was last restarted at {{ hostvars['worker1']['checks']['stdout'] }}"
+       create: yes
+    when:
+    - hostvars['worker1']['checks']['stdout'] is defined
+    - inventory_hostname in groups ['web']
+    ignore_errors: yes
+  - name: Add to index file html when nothing is inside
+    lineinfile: 
+       path: /var/www/html/index.html
+       line: "The Database is not running"
+       create: yes 
+    when: 
+    - hostvars['worker1']['checks']['stdout'] is undefined
+    - inventory_hostname in groups['web']
+  - name: test
+    debug: msg="i am working"
+    when: hostvars['worker1']['checks']['stdout'] is undefined  

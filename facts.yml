@@ -1,0 +1,23 @@
+---
+- hosts: all 
+  become: yes 
+  tasks:
+  - name: Create Custom facts
+    file:
+      path: /etc/ansible/facts.d
+      state: directory
+  - name: Create custom facts for Nyc
+    copy: 
+      src: /home/holden/plays/custom.fact
+      dest: /etc/ansible/facts.d
+    when: inventory_hostname in groups['nyc_aws']
+  - name: Create Custom Facts for Chi
+    copy: 
+      src: /home/holden/plays/pl/custom.fact
+      dest: /etc/ansible/facts.d
+    when: inventory_hostname in groups['chi_aws']
+  - name: Build Dynamic Index file 
+    template: 
+      src: /home/holden/plays/index.j2
+      dest: /var/www/html/
+    when: inventory_hostname in groups['web']   

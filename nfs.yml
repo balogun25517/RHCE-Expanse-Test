@@ -1,0 +1,23 @@
+---
+- hosts: worker1
+  become: yes 
+  roles:
+    - { role: geerlingguy.nfs } 
+  vars:
+    nfs_exports: [ "/logical/backups *(ro,sync,no_root_squash)" ] 
+
+- hosts: all
+  become: yes
+  tasks: 
+  - name: create a mount
+    file:
+      path: /configs
+      state: directory
+    when: inventory_hostname in groups['nyc_aws']
+  - name: Mount the Directory
+    mount:
+      src: 10.211.55.7:/logical/backups
+      path: /configs
+      state: mounted
+      fstype: nfs 
+    when: inventory_hostname in groups['nyc_aws'] 

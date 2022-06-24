@@ -1,0 +1,27 @@
+---
+- hosts: all 
+  become: yes 
+  tasks: 
+  - name: Set TimeZone for American Central
+    timezone:
+      name: America/Monterrey
+    when: inventory_hostname in groups['chi_aws']
+  - name: Set TimeZone for American Eastern
+    timezone:
+      name: America/Regina
+    when: inventory_hostname in groups['nyc_aws']
+  - name: insert line in file
+    lineinfile: 
+        path: /var/log/logins.log
+        owner: root
+        group: root
+        mode: '0766'
+        line: "-----User Logins for {{ inventory_hostname }}-------"
+        state: present
+        create: yes 
+  - name: Add line to skel
+    lineinfile: 
+       path: /etc/skel.bashrc
+       line: "date >> /var/log/logins.log"
+       state: present
+       create: yes   

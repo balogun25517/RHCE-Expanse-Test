@@ -1,0 +1,21 @@
+- hosts: all 
+  become: yes 
+  tasks:
+  - name: remove mariadb
+    yum: 
+      name: mariadb-server
+      state: absent
+    when: inventory_hostname != "worker1"
+  - name:  reload
+    command: systemctl daemon-reload
+    when: inventory_hostname != "worker1"
+  - name: remove log
+    file:
+      path: /var/log/mariadb/mariadb.log
+      state: absent
+    when: inventory_hostname != "worker1"
+  - name: remove indexfile
+    file:
+      path: /var/www/html/index.html
+      state: absent 
+    when: inventory_hostname in groups ['web']

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  vars:
+    timesync_ntp_servers:
+      - hostname: time-a-g.nist.gov
+        iburst: yes
+      - hostname: time-a-wwv.nist.gov
+        iburst: yes
+      - hostname: time-e-b.nist.gov
+        iburst: yes
+  roles:
+    - linux-system-roles.timesync

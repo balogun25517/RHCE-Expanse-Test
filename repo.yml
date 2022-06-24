@@ -1,0 +1,20 @@
+---
+- hosts: all 
+  become: yes
+  tasks: 
+  - name: Create Appstream 
+    yum_repository: 
+       name: base
+       description: Exam BaseOS Repo 
+       baseurl: http://repo.ansi.example.com/BaseOS
+       state: present
+       gpgcheck: no
+       enabled: yes
+  - name: Create Appstream 
+    yum_repository: 
+       name: base      
+       description: Exam AppStream Repo
+       baseurl: http://repo.ansi.example.com/AppStream
+       state: present
+       gpgcheck: no
+       enabled: yes

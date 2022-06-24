@@ -1,0 +1,19 @@
+---
+- hosts: all 
+  become: yes 
+  tasks: 
+  - name: archive file
+    archive: 
+      path: /etc/
+      dest: ~/{{ inventory_hostname }}_etc_backup.tar.bz2
+      format: bz2 
+  - name: Synchronize 
+    fetch:
+      src: ~/{{ inventory_hostname }}_etc_backup.tar.bz2
+      dest: /home/holden/logical/backups/
+      flat: yes
+  - name: copy to worker1
+    copy: 
+      src: /home/holden/logical/backups/
+      dest: /logical/backups/
+    when: inventory_hostname == "worker1"

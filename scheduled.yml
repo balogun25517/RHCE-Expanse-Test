@@ -1,0 +1,16 @@
+---
+- hosts: all 
+  become: yes 
+  tasks: 
+  - name: Install Crontab
+    yum:
+      name: cronie
+      state: present
+  - name: Cron Job to send a wall 
+    cron: 
+       name: "Dismiss the staff"
+       minute: "0"
+       hour: "5"
+       weekday: "5"
+       job: "/usr/bin/wall Time to go home!"
+       user: root

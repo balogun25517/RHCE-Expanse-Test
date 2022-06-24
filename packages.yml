@@ -1,0 +1,67 @@
+---
+- hosts: all 
+  become: yes 
+  tasks: 
+  - name: Install Packages on DEV 
+    yum: 
+       name: "{{ item }}"
+       state: present
+    loop: 
+     - git
+     - php
+     - httpd
+     - mod_ssl
+     - mariadb
+     - mariadb-server
+    when: inventory_hostname in groups['dev']
+  - name: Install Packages on DEV 
+    yum: 
+      name: "{{ item }}"
+      state: present
+    loop: 
+     - php
+     - httpd
+     - mod_ssl 
+    when: inventory_hostname in groups['web']
+  - name: Update All Packages 
+    yum:
+       name: "*" 
+       state: latest
+  - name: Verify Firewall is started
+    service:
+      name: firewalld
+      state: started
+      enabled: yes
+  - name: Start Apached for the Web Group
+    service: 
+       name: httpd
+       state: started
+       enabled: yes
+    when: inventory_hostname in groups['web']
+  - name: Allow Secure and non secure HTTP Traffic
+    firewalld: 
+       service: "{{ item }}"
+       permanent: yes
+       state: enabled
+       immediate: yes
+    loop: 
+      - http
+      - https
+  - name: Start Apached for the Web Group
+    service: 
+       name: "{{ item }}"
+       state: started
+    when: inventory_hostname in groups['dev']
+    loop: 
+      - httpd
+      - mariadb-server
+  - name: Allow tcp traffic  
+    firewalld: 
+      port: "{{ item }}"
+      permanent: yes
+      state: enabled 
+      immediate: yes
+    loop:
+      - 80/tcp
+      - 443/tcp
+      - 3306/tcp
